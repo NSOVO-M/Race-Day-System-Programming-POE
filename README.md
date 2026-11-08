@@ -1,8 +1,8 @@
-# 🏁 RaceDay - Sports Event Management System
+#  RaceDay - Sports Event Management System
 
 RaceDay is a full-stack, multi-project solution designed to manage sports events, participants, and organiser workflows. It features a robust RESTful API backend, a Model-View-Controller (MVC) frontend, and a comprehensive suite of unit tests.
 
-## 🏗️ Architecture & Technologies
+##  Architecture & Technologies
 
 This solution is built using **.NET 8** and follows a Clean Architecture approach, separated into three main projects:
 
@@ -21,7 +21,7 @@ This solution is built using **.NET 8** and follows a Clean Architecture approac
     *   **Framework:** xUnit & Moq
     *   **Purpose:** Unit testing API controllers (Auth, Events) using in-memory databases to ensure reliable, isolated tests.
 
-## 🚀 Getting Started (Local Development)
+##  Getting Started (Local Development)
 
 ### Prerequisites
 *   [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
