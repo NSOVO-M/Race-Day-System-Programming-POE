@@ -6,17 +6,46 @@
     <title>@ViewData["Title"] - RaceDay</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        body { background: #f8f9fa; }
-        .navbar-brand { font-weight: 700; letter-spacing: 1px; }
-        .hero { background: linear-gradient(135deg, #0d6efd, #6610f2); color: white; padding: 4rem 2rem; border-radius: .5rem; }
-        .card-event { transition: transform .2s; }
-        .card-event:hover { transform: translateY(-4px); }
-        .badge-confirmed { background: #198754; }
-        .badge-pending { background: #ffc107; color: #000; }
+        body {
+    background: #F0F8FF;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #2563A6;
+}
+
+.hero {
+    background: linear-gradient(135deg, #87CEEB, #4169E1);
+    color: white;
+    padding: 4rem 2rem;
+    border-radius: .5rem;
+}
+
+.card-event {
+    transition: transform .2s;
+    background: #FFFFFF;
+    border: 1px solid #D6EAF8;
+}
+
+.card-event:hover {
+    transform: translateY(-4px);
+}
+
+.badge-confirmed {
+    background: #4682B4;
+    color: white;
+}
+
+.badge-pending {
+    background: #BDE0FE;
+    color: #174A70;
+}
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
     <div class="container">
         <a class="navbar-brand" asp-controller="Home" asp-action="Index">RaceDay</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
@@ -39,7 +68,7 @@
             <ul class="navbar-nav">
                 @if (Context.Session.GetString("JWToken") != null)
                 {
-                    <li class="nav-item"><span class="navbar-text me-2">👤 @Context.Session.GetString("UserName") (@Context.Session.GetString("UserRole"))</span></li>
+                    <li class="nav-item"><span class="navbar-text me-2"> @Context.Session.GetString("UserName") (@Context.Session.GetString("UserRole"))</span></li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a></li>
                 }
                 else
