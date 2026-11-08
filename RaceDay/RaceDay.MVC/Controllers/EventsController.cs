@@ -29,21 +29,28 @@ public class EventsController : Controller
         return View(ev);
     }
 
-   
+
     [SessionAuthorize(Role = "Participant")]
     [HttpPost]
     public async Task<IActionResult> Enrol(int eventId, int categoryId)
     {
-        var (success, _) = await _api.PostAsync("api/enrolments",
+        var (success, error) = await _api.PostAsync("api/enrolments",
             new { EventId = eventId, CategoryId = categoryId });
 
-        TempData[success ? "Success" : "Error"] = success
-            ? "Enrolment submitted!"
-            : "Enrolment failed (may already exist).";
+        if (success)
+        {
+            TempData["Success"] = "Enrolment submitted!";
+            return RedirectToAction("MyEnrolments");
+        }
+        else
+        {
+           
+            TempData["Error"] = $"Enrolment failed: {error}";
 
-        return RedirectToAction(success ? "MyEnrolments" : "Details", success ? null : new { id = eventId });
+            
+            return RedirectToAction("Details", new { id = eventId });
+        }
     }
-
 
     [SessionAuthorize(Role = "Participant")]
     public async Task<IActionResult> MyEnrolments()
