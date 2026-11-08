@@ -23,13 +23,14 @@
                     <span class="badge bg-primary mb-2">@ev.EventType</span>
                     <h5 class="card-title">@ev.Title</h5>
                     <p class="card-text text-muted small">@ev.Description</p>
-                    <p class="mb-1"><strong>📅</strong> @ev.Date.ToString("dd MMM yyyy")</p>
-                    <p class="mb-1"><strong>📍</strong> @ev.Location</p>
-                    <p class="mb-1"><strong>🏃</strong> @ev.Distance km — @ev.OrganiserName</p>
+                    <p class="mb-1"><strong></strong> @ev.Date.ToString("dd MMM yyyy")</p>
+                    <p class="mb-1"><strong></strong> @ev.Location</p>
+                    <p class="mb-1"><strong></strong> @ev.Distance km — @ev.OrganiserName</p>
                 </div>
                 <div class="card-footer">
                     <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-outline-primary w-100">View Details</a>
                 </div>
+
             </div>
         </div>
     }
