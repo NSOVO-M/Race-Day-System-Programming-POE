@@ -1,94 +1,36 @@
-RaceDay
+# 🏁 RaceDay - Sports Event Management System
 
-RaceDay is a full-stack, web-based event management system designed for South African road running, walking, cycling, and community sporting events.
+RaceDay is a full-stack, multi-project solution designed to manage sports events, participants, and organiser workflows. It features a robust RESTful API backend, a Model-View-Controller (MVC) frontend, and a comprehensive suite of unit tests.
 
-The system provides a central platform where event organisers can create and manage events, categories, participants, and results, while participants can discover events, enrol in categories, and track their performance history.
+## 🏗️ Architecture & Technologies
 
-⸻
+This solution is built using **.NET 8** and follows a Clean Architecture approach, separated into three main projects:
 
-Project Overview
+1.  **`RaceDay.API`** (Backend)
+    *   **Framework:** ASP.NET Core Web API
+    *   **Database:** SQL Server (Entity Framework Core)
+    *   **Authentication:** JWT (JSON Web Tokens) with Role-Based Access Control (Admin, Organiser, Participant).
+    *   **Security:** Password hashing using `IPasswordHasher<User>`.
+    *   **Storage:** Azure Blob Storage (Emulated locally via **Azurite** in Docker) for event banner images.
+2.  **`RaceDay.MVC`** (Frontend)
+    *   **Framework:** ASP.NET Core MVC
+    *   **UI/UX:** Bootstrap 5 (Customized with modern gradient styling)
+    *   **Communication:** `HttpClient` interacting with the API, passing JWT tokens via Session state.
+    *   **Features:** Role-specific dashboards, event browsing, enrolment systems, and admin CRUD operations.
+3.  **`RaceDay.Tests`** (Testing)
+    *   **Framework:** xUnit & Moq
+    *   **Purpose:** Unit testing API controllers (Auth, Events) using in-memory databases to ensure reliable, isolated tests.
 
-South Africa hosts numerous road running, cycling, walking, and community sporting events. Traditional event management processes often rely on paper-based registration, spreadsheets, and disconnected communication channels.
+## 🚀 Getting Started (Local Development)
 
-RaceDay aims to provide a centralised digital platform that improves:
+### Prerequisites
+*   [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+*   [Visual Studio 2022](https://visualstudio.microsoft.com/) (with ASP.NET and web development workload)
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (For running the Azurite Storage Emulator)
+*   SQL Server (LocalDB or Express)
 
-* Event management
-* Participant registration
-* Category management
-* Enrolment tracking
-* Race results
-* Participant performance history
-* Communication and access to event information
-
-⸻
-
-Project Objectives
-
-The main objectives of RaceDay are to:
-
-1. Allow organisers to create and manage sporting events.
-2. Allow organisers to create event categories.
-3. Allow participants to browse available events.
-4. Allow participants to enrol in event categories.
-5. Store and manage participant information.
-6. Record and display race results.
-7. Allow participants to track their previous performances.
-8. Provide a structured database for all RaceDay information.
-9. Develop an API-driven full-stack application.
-10. Prepare the system for containerised and cloud-based deployment.
-
-⸻
-
-User Roles
-
-Participant
-
-Participants can:
-
-* Create an account
-* Manage their profile
-* Browse events
-* View event details
-* View available categories
-* Enrol in events
-* View enrolment status
-* View race results
-* Track performance history
-
-Event Organiser
-
-Organisers can:
-
-* Create an organiser profile
-* Create events
-* Update event information
-* Create event categories
-* Manage participants
-* View enrolments
-* Record race results
-* Manage event information
-
-Administrator
-
-Administrators can:
-
-* Manage users
-* Manage organiser accounts
-* Manage participant accounts
-* Monitor events
-* Manage system data
-* Maintain the overall platform
-
-⸻
-
-Database Design
-
-RaceDay uses a relational database consisting of the following core entities:
-
-1. Users
-2. OrganiserProfiles
-3. ParticipantProfiles
-4. Events
-5. Categories
-6. Enrolments
-7. Results
+### 1. Database Setup
+1. Open the `appsettings.json` in `RaceDay.API` and ensure the `DefaultConnection` string points to your local SQL Server instance.
+2. Open the **Package Manager Console** (Tools > NuGet Package Manager > Package Manager Console), set `RaceDay.API` as the default project, and run:
+   ```powershell
+   Update-Database
