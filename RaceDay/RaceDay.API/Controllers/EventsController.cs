@@ -25,28 +25,36 @@ public class EventsController : ControllerBase
     /// <summary>Get all events, optionally filtered by eventType (Run, Walk, Cycle).</summary>
 
     [HttpGet]
-    public IActionResult GetAll()
-    {
-        var events = _db.Events.ToList();
-
-        return Ok(events);
-    }
-    [HttpGet("getbyType")]
     public async Task<IActionResult> GetAll([FromQuery] string? eventType)
     {
         var query = _db.Events.Include(e => e.Organiser).AsQueryable();
+
         if (!string.IsNullOrEmpty(eventType))
             query = query.Where(e => e.EventType == eventType);
 
-        var events = await query.OrderBy(e => e.Date).Select(e => new EventListDto
-        {
-            Id = e.EventId, Title = e.Title, Description = e.Description, Date = e.Date,
-            Location = e.Location, Distance = e.Distance, EventType = e.EventType,
-            BannerImageUrl = e.BannerImageUrl, OrganiserName = e.Organiser.Name,
-            OrganiserId = e.OrganiserId
-        }).ToListAsync();
+        var events = await query
+            .OrderBy(e => e.Date)
+            .Select(e => new EventListDto
+            {
+                Id = e.EventId,
+                Title = e.Title,
+                Description = e.Description,
+                Date = e.Date,
+                Location = e.Location,
+                Distance = e.Distance,
+                EventType = e.EventType,
+                BannerImageUrl = e.BannerImageUrl,
+                OrganiserName = e.Organiser.Name,
+                OrganiserId = e.OrganiserId
+            })
+            .ToListAsync();
+
         return Ok(events);
     }
+
+    [HttpGet("getbyType")]
+    public Task<IActionResult> GetByType([FromQuery] string? eventType)
+        => GetAll(eventType);
 
     /// <summary>Get a single event with its categories.</summary>
     [HttpGet("{id}")]
@@ -60,10 +68,20 @@ public class EventsController : ControllerBase
 
         return Ok(new
         {
-            ev.EventId, ev.Title, ev.Description, ev.Date, ev.Location, ev.Distance,
-            ev.EventType, ev.BannerImageUrl, ev.OrganiserId,
+            Id = ev.EventId,
+            Title = ev.Title,
+            Description = ev.Description,
+            Date = ev.Date,
+            Location = ev.Location,
+            Distance = ev.Distance,
+            EventType = ev.EventType,
+            BannerImageUrl = ev.BannerImageUrl,
+            OrganiserId = ev.OrganiserId,
             OrganiserName = ev.Organiser.Name,
-            Categories = ev.Categories.Select(c => new { c.EventId, c.Name })
+            Categories = ev.Categories
+                .OrderBy(c => c.Name)
+                .Select(c => new { Id = c.CategoryId, Name = c.Name })
+                .ToList()
         });
     }
 
