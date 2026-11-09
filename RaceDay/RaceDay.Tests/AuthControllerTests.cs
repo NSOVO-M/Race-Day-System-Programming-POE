@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Moq;
 using RaceDay.API.Controllers;
 using RaceDay.API.Data;
 using RaceDay.API.DTOs;
@@ -28,15 +29,24 @@ public class AuthControllerTests
             ["Jwt:ExpiryHours"] = "3"
         }).Build();
 
+    
+    private static IPasswordHasher<User> GetHasher() => new PasswordHasher<User>();
+
     [Fact]
     public async Task Register_NewUser_ReturnsOk()
     {
         var db = GetDb();
-        var controller = new AuthController(db, GetConfig());
+        var hasher = GetHasher();
+        var controller = new AuthController(db, GetConfig(), hasher);
+
         var result = await controller.Register(new RegisterDto
         {
-            Name = "Test", Email = "test@test.com", Password = "Pass123!", Role = "Participant"
+            Name = "Test",
+            Email = "test@test.com",
+            Password = "Pass123!",
+            Role = "Participant"
         });
+
         Assert.IsType<OkObjectResult>(result);
         Assert.Single(db.Users);
     }
@@ -45,13 +55,20 @@ public class AuthControllerTests
     public async Task Register_DuplicateEmail_ReturnsBadRequest()
     {
         var db = GetDb();
+        var hasher = GetHasher();
+
         db.Users.Add(new User { Name = "Ex", Email = "test@test.com", PasswordHash = "hash", Role = "Participant" });
         await db.SaveChangesAsync();
-        var controller = new AuthController(db, GetConfig());
+
+        var controller = new AuthController(db, GetConfig(), hasher);
         var result = await controller.Register(new RegisterDto
         {
-            Name = "Test", Email = "test@test.com", Password = "Pass123!", Role = "Participant"
+            Name = "Test",
+            Email = "test@test.com",
+            Password = "Pass123!",
+            Role = "Participant"
         });
+
         Assert.IsType<BadRequestObjectResult>(result);
     }
 
@@ -59,14 +76,18 @@ public class AuthControllerTests
     public async Task Login_ValidCredentials_ReturnsOkWithToken()
     {
         var db = GetDb();
-        db.Users.Add(new User
-        {
-            Name = "Test", Email = "test@test.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pass123!"), Role = "Participant"
-        });
+        var hasher = GetHasher();
+
+       
+        var testUser = new User { Name = "Test", Email = "test@test.com", Role = "Participant" };
+        testUser.PasswordHash = hasher.HashPassword(testUser, "Pass123!");
+
+        db.Users.Add(testUser);
         await db.SaveChangesAsync();
-        var controller = new AuthController(db, GetConfig());
+
+        var controller = new AuthController(db, GetConfig(), hasher);
         var result = await controller.Login(new LoginDto { Email = "test@test.com", Password = "Pass123!" });
+
         var ok = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(ok.Value);
     }
@@ -75,14 +96,17 @@ public class AuthControllerTests
     public async Task Login_InvalidPassword_ReturnsUnauthorized()
     {
         var db = GetDb();
-        db.Users.Add(new User
-        {
-            Name = "Test", Email = "test@test.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Pass123!"), Role = "Participant"
-        });
+        var hasher = GetHasher();
+
+        var testUser = new User { Name = "Test", Email = "test@test.com", Role = "Participant" };
+        testUser.PasswordHash = hasher.HashPassword(testUser, "Pass123!");
+
+        db.Users.Add(testUser);
         await db.SaveChangesAsync();
-        var controller = new AuthController(db, GetConfig());
-        var result = await controller.Login(new LoginDto { Email = "test@test.com", Password = "Wrong" });
+
+        var controller = new AuthController(db, GetConfig(), hasher);
+        var result = await controller.Login(new LoginDto { Email = "test@test.com", Password = "WrongPassword!" });
+
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
@@ -90,8 +114,11 @@ public class AuthControllerTests
     public async Task Login_NonExistentEmail_ReturnsUnauthorized()
     {
         var db = GetDb();
-        var controller = new AuthController(db, GetConfig());
+        var hasher = GetHasher();
+        var controller = new AuthController(db, GetConfig(), hasher);
+
         var result = await controller.Login(new LoginDto { Email = "no@test.com", Password = "Pass123!" });
+
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 }
