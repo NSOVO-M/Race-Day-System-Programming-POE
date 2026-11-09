@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RaceDay.API.Models;
 
@@ -12,11 +13,9 @@ public class Result
 
     public int FinishingPosition { get; set; }
 
-    // Foreign keys
     public int EventId { get; set; }
-    public int ParticipantId { get; set; }
-
-    // Navigation properties
     public Event? Event { get; set; }
-    public Participant? Participant { get; set; }
+
+    public int ParticipantId { get; set; }
+    public User? Participant { get; set; }
 }
