@@ -1,5 +1,8 @@
 ﻿@model EventViewModel
-@{ ViewData["Title"] = Model.Title; }
+@{
+    ViewData["Title"] = Model.Title;
+}
+
 <div class="card shadow">
     @if (!string.IsNullOrEmpty(Model.BannerImageUrl))
     {
@@ -11,24 +14,31 @@
         <ul class="list-unstyled">
             <li><strong> &#128197; Date:</strong> @Model.Date.ToString("dddd, dd MMM yyyy")</li>
             <li><strong> &#128205; Location:</strong> @Model.Location</li>
-            <li><strong> &#127939;Distance:</strong> @Model.Distance km</li>
+            <li><strong> &#127939; Distance:</strong> @Model.Distance km</li>
             <li><strong> &#128100; Organiser:</strong> @Model.OrganiserName</li>
         </ul>
-        <h4 class="mt-4">Categories</h4>
-        @if (Context.Session.GetString("UserRole") == "Participant")
-        {
-            @foreach (var cat in Model.Categories)
-            {
-                <form asp-action="Enrol" method="post" class="d-inline-block me-2 mb-2">
-                    <input type="hidden" name="eventId" value="@Model.Id" />
-                    <input type="hidden" name="categoryId" value="@cat.Id" />
-                    <button type="submit" class="btn btn-success">Enrol in @cat.Name</button>
-                </form>
-            }
-        }
-        else
-        {
-            <ul>@foreach (var c in Model.Categories) { <li>@c.Name</li> }</ul>
-        }
+    </div>
+</div>
+
+
+<h3 class="mt-4">Enrol in this Event</h3>
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Enrol" method="post">
+            
+            <input type="hidden" name="eventId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Select Category:</label>
+                <select name="categoryId" class="form-select" required>
+                    <option value="">-- Choose a category --</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Enrol Now</button>
+        </form>
     </div>
 </div>

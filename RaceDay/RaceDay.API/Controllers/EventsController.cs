@@ -23,7 +23,15 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>Get all events, optionally filtered by eventType (Run, Walk, Cycle).</summary>
+
     [HttpGet]
+    public IActionResult GetAll()
+    {
+        var events = _db.Events.ToList();
+
+        return Ok(events);
+    }
+    [HttpGet("getbyType")]
     public async Task<IActionResult> GetAll([FromQuery] string? eventType)
     {
         var query = _db.Events.Include(e => e.Organiser).AsQueryable();
