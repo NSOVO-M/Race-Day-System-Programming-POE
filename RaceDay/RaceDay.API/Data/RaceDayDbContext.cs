@@ -20,44 +20,37 @@ public class RaceDayDbContext : DbContext
 
     public DbSet<Result> Results => Set<Result>();
 
-    public DbSet<Participant> Participants => Set<Participant>();
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Participant - Enrolment (One-to-Many)
         modelBuilder.Entity<Enrolment>()
             .HasOne(e => e.Participant)
-            .WithMany(p => p.Enrolments)
+            .WithMany(u => u.Enrolments)
             .HasForeignKey(e => e.ParticipantId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Event - Enrolment (One-to-Many)
         modelBuilder.Entity<Enrolment>()
             .HasOne(e => e.Event)
-            .WithMany()
+            .WithMany(e => e.Enrolments)
             .HasForeignKey(e => e.EventId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Category - Enrolment (One-to-Many)
         modelBuilder.Entity<Enrolment>()
             .HasOne(e => e.Category)
-            .WithMany()
+            .WithMany(c => c.Enrolments)
             .HasForeignKey(e => e.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Participant - Result (One-to-Many)
         modelBuilder.Entity<Result>()
             .HasOne(r => r.Participant)
-            .WithMany(p => p.Results)
+            .WithMany(u => u.Results)
             .HasForeignKey(r => r.ParticipantId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Event - Result (One-to-Many)
         modelBuilder.Entity<Result>()
             .HasOne(r => r.Event)
-            .WithMany()
+            .WithMany(e => e.Results)
             .HasForeignKey(r => r.EventId)
             .OnDelete(DeleteBehavior.Restrict);
     }
