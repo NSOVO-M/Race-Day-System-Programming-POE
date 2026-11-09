@@ -34,3 +34,22 @@ This solution is built using **.NET 8** and follows a Clean Architecture approac
 2. Open the **Package Manager Console** (Tools > NuGet Package Manager > Package Manager Console), set `RaceDay.API` as the default project, and run:
    ```powershell
    Update-Database
+## Azure Blob Storage (Azurite) Setup
+The API uses Azurite to emulate Azure Blob Storage locally for event banners.
+
+Ensure Docker Desktop is running.
+
+Start the Azurite container via the terminal or Visual Studio Connected Services:
+
+bash
+docker run -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+The API is already configured to use UseDevelopmentStorage=true, so it will connect to this container automatically.
+
+## Running Tests
+The solution includes automated unit tests for the API controllers.
+
+In Visual Studio, navigate to Test > Test Explorer.
+
+Click Run All to execute the test suite.
+
+Note: The CI/CD pipeline (GitHub Actions) is configured to automatically run these tests on every push to the main branch.
