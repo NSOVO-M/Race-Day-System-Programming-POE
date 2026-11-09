@@ -17,12 +17,13 @@ public class AuthController : ControllerBase
 {
     private readonly RaceDayDbContext _db;
     private readonly IConfiguration _config;
-    private IPasswordHasher<User> _hasher;
-    public AuthController(RaceDayDbContext db, IConfiguration config, IPasswordHasher<User> hasher)
+    private readonly IPasswordHasher<User> _hasher;
+
+    public AuthController(RaceDayDbContext db, IConfiguration config, IPasswordHasher<User>? hasher = null)
     {
         _db = db;
         _config = config;
-        _hasher = hasher;
+        _hasher = hasher ?? new PasswordHasher<User>();
     }
 
     /// <summary>Register a new user (Organiser or Participant).</summary>
@@ -36,8 +37,8 @@ public class AuthController : ControllerBase
         {
             Name = dto.Name,
             Email = dto.Email,
-            Role = "Participant",
-            PasswordHash = null,
+            Role = dto.Role ?? "Participant",
+            PasswordHash = string.Empty,
         };
         user.PasswordHash = _hasher.HashPassword(user, dto.Password);
 
@@ -51,16 +52,18 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-        if (user == null )
+        if (user == null)
             return Unauthorized(new { message = "Invalid email or password." });
-        var PasswordHash = _hasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
-        if(PasswordHash == PasswordVerificationResult.Failed) 
+
+        var verification = _hasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
+        if (verification == PasswordVerificationResult.Failed)
         {
-            return Unauthorized("Invalid email or password");
+            return Unauthorized(new { message = "Invalid email or password." });
         }
 
         var token = GenerateJwtToken(user);
-        return Ok(new LoginResponseDto { Token = token, UserName = user.Name, Role = user.Role });
+        var role = user.Role ?? "Participant";
+        return Ok(new LoginResponseDto { Token = token, UserName = user.Name, Role = role });
     }
 
     private string GenerateJwtToken(User user)
@@ -74,7 +77,7 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role ?? "Participant")
         };
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
