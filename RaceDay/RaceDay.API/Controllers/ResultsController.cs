@@ -82,7 +82,7 @@ public class ResultsController : ControllerBase
             .Select(r => new ResultDto
             {
                 Id = r.ResultId, EventId = r.EventId, EventTitle = r.Event.Title,
-                ParticipantId = r.ParticipantId, ParticipantName = r.Participant.ParticipantName,
+                ParticipantId = r.ParticipantId, ParticipantName = r.Participant.Name,
                 FinishTime = r.FinishTime, FinishingPosition = r.FinishingPosition
             }).ToListAsync();
         return Ok(results);
